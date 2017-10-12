@@ -325,11 +325,7 @@ def approx(n):
             pwr = int(n)
             apx = 1
     elif not n or abs(n) < base:  # small value
-        if abs(n) < 1:  # invert and return with ordinal
-            invr = 1.0 / n
-            if abs(invr) < base: return ordinal(round(invr), True)
-            else: return approx(invr) + _sh_ords[0]
-        else: return str(int(round(n)))
+        return str(int(round(n)))
     else:  # ints, floats, longs
         if n < 0: sgn, n = '-', abs(n)
         lgg = round(log(n, base), 9)
