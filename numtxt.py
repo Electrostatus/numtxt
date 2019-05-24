@@ -475,15 +475,15 @@ def setStyle(style=None):
     'long' -> million, milliard, billion, billiard...
     'british' -> million, thousand million, billion, thousand billion...
     """
-    global _short_suf, _sub_long_suf, suffix_styles, _cur_suf_style
+    global _short_suf, _sub_long_suf, suffix_styles, current_style
     global _qk_noll, _qk_conw  # these change based on the style
 
     if str(style).lower() not in suffix_styles and style != None:
         v = TypeError('invalid style')
         raise v
 
-    if style is None:
-        return _cur_suf_style
+    if style is None or style.lower() == current_style:
+        return current_style
     elif style.lower() == 'short':
         _short_suf = True
         _sub_long_suf = False
@@ -495,5 +495,5 @@ def setStyle(style=None):
         _sub_long_suf = True
 
     _qk_noll = {}; _qk_conw = {}  # must be cleared to match new style
-    _cur_suf_style = style.lower()
-    return _cur_suf_style
+    current_style = style.lower()
+    return current_style
