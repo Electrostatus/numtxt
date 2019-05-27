@@ -119,11 +119,11 @@ Additionally, there are three styles for suffixes which can be set
  Default is 'short'.
 """
 
-__all__= ['approx', 'name', 'ordinal', 'setMethod', 'setStyle',
+__all__= ['approx', 'name', 'cardinal', 'ordinal', 'setMethod', 'setStyle',
           'methods', 'current_method', 'suffix_styles', 'current_style',]
 
 # supporting functions and naming systems ------------------
-def _noll(n):
+def _noll(n, suffix=True):
     "noll naming system\nreturns name of 1000^n"
     # http://www.isthe.com/chongo/tech/math/number/number.html
     # published 1994? (earliest date on website)
@@ -158,9 +158,10 @@ def _noll(n):
 
     un = prfs[1]  # name does not start with this when above 1000^1000
     if mil > 1 and name.startswith(un): name = name.replace(un, '', 1)
-    return th + name + sfx
+    if suffix: return th + name + sfx
+    else: return th + name
 
-def _conway(n):
+def _conway(n, suffix=True):
     "conway-wechsler naming system\nreturns name of 1000^n"
     # http://www.mrob.com/pub/math/largenum.html#conway-wechsler
     # published 1996, pg 15-16 in 'The Book of Numbers'
@@ -201,9 +202,10 @@ def _conway(n):
 
         if sect[-1] in 'aeiou': sect = sect[:-1]  # strip last vowel
         name = sect + 'illi' + name if name else sect + name
-    return th + name + suf
+    if suffix: return th + name + suf
+    else: return th + name
 
-def _rowlett(n):
+def _rowlett(n, suffix=True):
     "rowlett naming system\nreturns name of 1000^n"
     # http://www.unc.edu/~rowlett/units/large.html - published 2001
     n = int(abs(n))
@@ -232,7 +234,10 @@ def _rowlett(n):
 
     un = prfs[1]  # name does not start with this when above 1000^1000
     if mil > 1 and name.startswith(un): name = name.replace(un, '', 1)
-    return name.rstrip('aeiou') + suf  # strip ending vowels (guessing)
+
+    name = name.rstrip('aeiou')  # strip ending vowels (guessing)
+    if suffix: return name + suf
+    else: return name
 
 def _knuth(n, condensed=False, lvl=0, comma=False, is_log=False):
     "knuth naming system"
@@ -429,6 +434,9 @@ def name(n, condensed=False):
         pwr += 1
 
     return (sgn + nam).strip(' ,')
+
+def cardinal(n, condensed=False): return name(n, condensed)
+cardinal.__doc__ = name.__doc__
 
 def ordinal(n, short=False):
     """returns the ordinal name of n
