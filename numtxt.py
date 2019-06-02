@@ -73,11 +73,17 @@ _lg_ords = {1: 'first', 2: 'second', 3: 'third', 5: 'fifth',
 # other names - used in multiple functions
 _zero, _hun, _thous = 'zero', 'hundred', 'thousand'
 _neg = 'negative'#'minus'
+
+# preset names - used in precedence function
+_pced = {0: 'nullary', 1: 'primary', 2: 'secondary', 3: 'tertiary',
+         4: 'quaternary', 6: 'senary', 7: 'septenary', 8: 'octonary', }
 # not every word is defined here, some are in the functions that use them
 
 # quick lookup tables --------------------------------------
 _qk_tens = {}; _qk_noll = {}  # these are populated as needed
 _qk_conw = {}; _qk_rowt = {}
+_qk_pced = {}
+_qk_pced.update(_pced)
 _max_table_size = 2500  # don't let the quick lookup tables get too large
 
 # methods and rules ----------------------------------------
@@ -100,6 +106,9 @@ refs = ('References and related',
         'https://en.wikipedia.org/wiki/Numeral_prefix',
         'https://en.wikipedia.org/wiki/Names_of_large_numbers',
         'https://en.wikipedia.org/wiki/Ordinal_number_%28linguistics%29',
+        'http://verbmall.blogspot.com/2007/01/ordinal-numbers-revisited.html',
+        'https://english.stackexchange.com/q/352146',
+        'https://en.wikipedia.org/wiki/Arity',
         )
 
 __doc__ = """
@@ -119,8 +128,9 @@ Additionally, there are three styles for suffixes which can be set
  Default is 'short'.
 """
 
-__all__= ['approx', 'name', 'cardinal', 'ordinal', 'setMethod', 'setStyle',
-          'methods', 'current_method', 'suffix_styles', 'current_style',]
+__all__= ['approx', 'name', 'cardinal', 'ordinal', 'precedence', 'setMethod',
+          'setStyle', 'methods', 'current_method', 'suffix_styles',
+          'current_style',]
 
 # supporting functions and naming systems ------------------
 def _noll(n, suffix=True):
@@ -459,6 +469,44 @@ def ordinal(n, short=False):
             nme = nme.replace('y', 'ieth')
         else: nme += so[0]
     return nme
+
+def precedence(n):
+    """returns the precedence name of n
+    1 -> 'primary'
+    2 -> 'secondary'"""
+    cur_sty = setStyle()
+    setStyle('short')
+    n = abs(int(n))
+
+    try:  # lookup table
+        pcd = _qk_pced[n]  
+    except KeyError:  # fallback
+        pcd = _conway(n + 1, False)
+        # naming rules for precedence
+        if pcd[-1] == 'c': pcd = pcd[:-1] + 'n'
+        if pcd[-1] == 't': pcd = pcd[:-1]
+        # the above rules allows the fewest preset names
+        # matched with known spellings
+        pcd = pcd + 'ary'
+        
+        if len(_qk_pced) < _max_table_size:
+            _qk_pced[n] = pcd  # store for next time
+
+    setStyle(cur_sty)
+    return pcd
+
+def prefix(n, suffix=''):
+    "generates the prefix of n"
+    suf = str(suffix)
+    if current_method == 'noll':
+        func = _noll
+    elif current_method == 'rowlett':
+        func = _rowlett
+    else: func = _conway
+    # knuth's method doesn't lend itself to prefixes well, as it's not
+    # building the name itself (it uses conway's) but rather it builds
+    # how the names are organized. As such, it's left of out this func
+    return func(n + 1, False) + suf
 
 # settings functions ---------------------------------------
 def setMethod(method=None):
