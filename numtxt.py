@@ -74,16 +74,17 @@ _lg_ords = {1: 'first', 2: 'second', 3: 'third', 5: 'fifth',
 _zero, _hun, _thous = 'zero', 'hundred', 'thousand'
 _neg = 'negative'#'minus'
 
-# preset names - used in precedence function
+# preset names - used in precedence and ?tuple? functions
 _pced = {0: 'nullary', 1: 'primary', 2: 'secondary', 3: 'tertiary',
          4: 'quaternary', 6: 'senary', 7: 'septenary', 8: 'octonary', }
+_tupl = {0: 'empty', 1: 'single', 2: 'double', 3: 'triple'}
 # not every word is defined here, some are in the functions that use them
 
 # quick lookup tables --------------------------------------
 _qk_tens = {}; _qk_noll = {}  # these are populated as needed
 _qk_conw = {}; _qk_rowt = {}
-_qk_pced = {}
-_qk_pced.update(_pced)
+_qk_pced = {}; _qk_tupl = {}
+_qk_pced.update(_pced); _qk_tupl.update(_tupl)
 _max_table_size = 2500  # don't let the quick lookup tables get too large
 
 # methods and rules ----------------------------------------
@@ -106,6 +107,7 @@ refs = ('References and related',
         'https://en.wikipedia.org/wiki/Numeral_prefix',
         'https://en.wikipedia.org/wiki/Names_of_large_numbers',
         'https://en.wikipedia.org/wiki/Ordinal_number_%28linguistics%29',
+
         'http://verbmall.blogspot.com/2007/01/ordinal-numbers-revisited.html',
         'https://english.stackexchange.com/q/352146',
         'https://en.wikipedia.org/wiki/Arity',
@@ -494,6 +496,34 @@ def precedence(n):
 
     setStyle(cur_sty)
     return pcd
+
+#def tuple(n):
+#def tuple2(n):
+#def tuppel(n):
+#def tups(n):
+#def tupl(n):
+#def tuppeeel(n):
+#def tupperware(n):
+#def the_function_that_returns_that_infernal_name_already_in_use_by_python(n):
+def uple(n):
+    """returns the tuple name of n
+    1 -> 'single'
+    2 -> 'double'"""
+    n = abs(int(n))
+    cur_sty = setStyle()
+    setStyle('short')
+
+    try:  # lookup table
+        tup = _qk_tupl[n]
+    except KeyError:  # fallback
+        tup = _conway(n + 1, False)
+        tup = tup + 'uple'
+        
+        if len(_qk_tupl) < _max_table_size:
+            _qk_tupl[n] = tup  # store for next time
+
+    setStyle(cur_sty)
+    return tup
 
 def prefix(n, suffix=''):
     "generates the prefix of n"
