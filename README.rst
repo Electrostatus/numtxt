@@ -2,7 +2,7 @@ numtxt
 ======
 A pure Python module that gives both full and approximate names for numbers
 
-Contains functions that give the cardinal name (one, two, three, ...), the ordinal name (first, second, third, ...) as well as approximations (23.3458e45 -> '23.346 quattuordecillion'). Has four different naming methods for powers and three different suffix styles.
+Contains functions that give the cardinal name (one, two, three, ...), the ordinal name (first, second, third, ...), the precedence (primary, secondary, tertiary, ...) as well as approximations (23.3458e45 -> '23.346 quattuordecillion') and prefixes. Has four different naming methods for powers and three different suffix styles.
 
 Suffix Styles
 -------------

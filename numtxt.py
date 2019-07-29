@@ -107,7 +107,6 @@ refs = ('References and related',
         'https://en.wikipedia.org/wiki/Numeral_prefix',
         'https://en.wikipedia.org/wiki/Names_of_large_numbers',
         'https://en.wikipedia.org/wiki/Ordinal_number_%28linguistics%29',
-
         'http://verbmall.blogspot.com/2007/01/ordinal-numbers-revisited.html',
         'https://english.stackexchange.com/q/352146',
         'https://en.wikipedia.org/wiki/Arity',
@@ -130,11 +129,16 @@ Additionally, there are three styles for suffixes which can be set
  Default is 'short'.
 """
 
-__all__= ['approx', 'name', 'cardinal', 'ordinal', 'precedence', 'setMethod',
-          'setStyle', 'methods', 'current_method', 'suffix_styles',
-          'current_style',]
+__all__= ['approx', 'name', 'cardinal', 'ordinal', 'precedence', 'prefix',
+          'setMethod', 'setStyle', 'methods', 'current_method',
+          'suffix_styles', 'current_style',]
 
 # supporting functions and naming systems ------------------
+def _ln(x, base=None):
+    "adapter, allows log to be overridden by gmpy2/mpmath/whatever"
+    if base is None: return log(x)
+    else: return log(x) / log(base)
+    
 def _noll(n, suffix=True):
     "noll naming system\nreturns name of 1000^n"
     # http://www.isthe.com/chongo/tech/math/number/number.html
@@ -270,10 +274,10 @@ def _knuth(n, condensed=False, lvl=0, comma=False, is_log=False):
             return a + b
 
     if is_log:
-        p = int(log(n, 2))
+        p = int(_ln(n, 2))
         base = 2 ** p
     else:  # p is also the deepest the recursion can go
-        p = int(log(log(n, 10000), 2))
+        p = int(_ln(_ln(n, 10000), 2))
         base = 10000 ** (2 ** p)
     d, r = divmod(n, base)
 
@@ -345,7 +349,7 @@ def approx(n):
         return str(int(round(n)))
     else:  # ints, floats, longs
         if n < 0: sgn, n = '-', abs(n)
-        lgg = round(log(n, base), 9)
+        lgg = round(_ln(n, base), 9)
         pwr = int(lgg)
         apx = base ** (lgg - pwr)
 
@@ -497,14 +501,6 @@ def precedence(n):
     setStyle(cur_sty)
     return pcd
 
-#def tuple(n):
-#def tuple2(n):
-#def tuppel(n):
-#def tups(n):
-#def tupl(n):
-#def tuppeeel(n):
-#def tupperware(n):
-#def the_function_that_returns_that_infernal_name_already_in_use_by_python(n):
 def uple(n):
     """returns the tuple name of n
     1 -> 'single'
@@ -528,10 +524,8 @@ def uple(n):
 def prefix(n, suffix=''):
     "generates the prefix of n"
     suf = str(suffix)
-    if current_method == 'noll':
-        func = _noll
-    elif current_method == 'rowlett':
-        func = _rowlett
+    if current_method == 'noll': func = _noll
+    elif current_method == 'rowlett': func = _rowlett
     else: func = _conway
     # knuth's method doesn't lend itself to prefixes well, as it's not
     # building the name itself (it uses conway's) but rather it builds
