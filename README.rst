@@ -50,3 +50,28 @@ Naming Methods
   - 10^12 = 10 myllion
   - 10^51 = 1000 byllion tryllion
   - 10^342 = 100 myriad byllion quadryllion sextyllion
+
+
+Version History
+---------------
+- **1.1.0** 
+  August 18th, 2019
+
+  - Added precedence function (primary, secondary, tertiary, ...)
+  - Added prefix function
+  - Log function can now be overridden by third-party modules (gmpy2, mpmath) to allow compatibility
+  - Added (t)uple function (single, double, triple, ...)
+  - Added cardinal function call; identical to name function
+  - Added version history to README
+- **1.0.2** 
+  November 29th, 2017
+
+  - Fixed approx handling of zero & removed approx handling of small values
+- **1.0.1** 
+  January 20th, 2017
+
+  - Modified readme/setup.py for correct pip installation
+- **1.0.0** 
+  January 20th, 2017
+
+  - Initial release

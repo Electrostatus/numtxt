@@ -130,7 +130,7 @@ Additionally, there are three styles for suffixes which can be set
 """
 
 __all__= ['approx', 'name', 'cardinal', 'ordinal', 'precedence', 'prefix',
-          'setMethod', 'setStyle', 'methods', 'current_method',
+          'uple', 'setMethod', 'setStyle', 'methods', 'current_method',
           'suffix_styles', 'current_style',]
 
 # supporting functions and naming systems ------------------
