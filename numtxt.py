@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import log
+VERSION = '1.1.0'
 
 # prefixes, suffixes and other words -----------------------
 _noll_prefixes = {0: '',  # noll prefix definitions
