@@ -58,6 +58,17 @@ _suffixes = {'noll': ('illion', 'tillion', 'illard', 'tillard'),
              'conway-wechsler': ('illion', 'illard'),
              'rowlett': ('illion',), 'knuth': ('yllion',)}
 
+# SI prefixes in terms of powers of 1000
+_si_prefixes = { 1: 'k',  2: 'M',  3: 'G',  4: 'T',
+          0: '', 5: 'P',  6: 'E',  7: 'Z',  8: 'Y',
+                -1: 'm', -2: 'u', -3: 'n', -4: 'p', # -2: '\u03bc',#'\xb5',
+                -5: 'f', -6: 'a', -7: 'z', -8: 'y',}
+_si_prefixes[-2] = '\u03bc' if type(3/2).__name__ == 'float' else 'u'
+
+# * in terms of powers of ten
+_si_prefixes_10 = {1: 'da', 2: 'h', -1: 'd', -2: 'c',}
+_si_prefixes_10.update({i * 3: j for i, j in _si_prefixes.items()})
+
 # 0-99 names - used in _tens function
 _tn_ones =  ('', 'one', 'two', 'three', 'four', 'five', 'six',
             'seven', 'eight', 'nine')
@@ -132,14 +143,14 @@ Additionally, there are three styles for suffixes which can be set
 
 __all__= ['approx', 'name', 'cardinal', 'ordinal', 'precedence', 'prefix',
           'uple', 'setMethod', 'setStyle', 'methods', 'current_method',
-          'suffix_styles', 'current_style',]
+          'suffix_styles', 'current_style', 'VERSION', 'si', ]
 
 # supporting functions and naming systems ------------------
 def _ln(x, base=None):
     "adapter, allows log to be overridden by gmpy2/mpmath/whatever"
     if base is None: return log(x)
     else: return log(x) / log(base)
-    
+
 def _noll(n, suffix=True):
     "noll naming system\nreturns name of 1000^n"
     # http://www.isthe.com/chongo/tech/math/number/number.html
@@ -355,7 +366,7 @@ def approx(n):
         apx = base ** (lgg - pwr)
 
     # select method and use
-    apx_fmt = '{:0.3f} '#'{: 7.3f} '
+    apx_fmt = '{:0.3f} '#'{:7.3f} '
     if mthd == 'noll':
         try:
             nme = _qk_noll[pwr]  # lookup table
@@ -480,13 +491,14 @@ def ordinal(n, short=False):
 def precedence(n):
     """returns the precedence name of n
     1 -> 'primary'
-    2 -> 'secondary'"""
+    2 -> 'secondary'
+    """
     cur_sty = setStyle()
     setStyle('short')
     n = abs(int(n))
 
     try:  # lookup table
-        pcd = _qk_pced[n]  
+        pcd = _qk_pced[n]
     except KeyError:  # fallback
         pcd = _conway(n + 1, False)
         # naming rules for precedence
@@ -495,7 +507,7 @@ def precedence(n):
         # the above rules allows the fewest preset names
         # matched with known spellings
         pcd = pcd + 'ary'
-        
+
         if len(_qk_pced) < _max_table_size:
             _qk_pced[n] = pcd  # store for next time
 
@@ -505,7 +517,8 @@ def precedence(n):
 def uple(n):
     """returns the tuple name of n
     1 -> 'single'
-    2 -> 'double'"""
+    2 -> 'double'
+    """
     n = abs(int(n))
     cur_sty = setStyle()
     setStyle('short')
@@ -515,7 +528,7 @@ def uple(n):
     except KeyError:  # fallback
         tup = _conway(n + 1, False)
         tup = tup + 'uple'
-        
+
         if len(_qk_tupl) < _max_table_size:
             _qk_tupl[n] = tup  # store for next time
 
@@ -532,6 +545,27 @@ def prefix(n, suffix=''):
     # building the name itself (it uses conway's) but rather it builds
     # how the names are organized. As such, it's left of out this func
     return func(n + 1, False) + suf
+
+def si(n, unit=None, base=1e3, **kwargs):
+    """approximates n with SI prefixes
+    si(299792458/475e-09, 'Hz') -> '631.142 THz'
+    to use power of ten prefixes (hecto, deca, deci, centi), set base to 10:
+    si(123, base=10) -> '1.230 h'
+    """
+    if base not in (10, 1e3, 1024): base = 1e3
+    pfx = _si_prefixes_10 if base == 10 else _si_prefixes
+
+    lg = _ln(abs(n) or 1, base)
+    pw = int(lg - lg % 1)  # floor, without importing
+    mx = max(pfx.keys())  # if SI adds more, update the prefix dict
+
+    sgn = '' if n >= 0 else '-'
+    unit = str(unit) if unit is not None else ''
+    if abs(pw) > mx: pw = pw // abs(pw) * mx  # don't pass pfx limits
+    pw = max(filter(lambda z: z <= pw, pfx))  # floor to nearest pfx
+
+    si_str = '{:0.3f}'.format(float(base) ** (lg - pw))
+    return (sgn + si_str + ' ' + pfx[pw] + unit).rstrip()
 
 # settings functions ---------------------------------------
 def setMethod(method=None):
