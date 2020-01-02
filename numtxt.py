@@ -61,13 +61,21 @@ _suffixes = {'noll': ('illion', 'tillion', 'illard', 'tillard'),
 # SI prefixes in terms of powers of 1000
 _si_prefixes = { 1: 'k',  2: 'M',  3: 'G',  4: 'T',
           0: '', 5: 'P',  6: 'E',  7: 'Z',  8: 'Y',
-                -1: 'm', -2: 'u', -3: 'n', -4: 'p', # -2: '\u03bc',#'\xb5',
+                -1: 'm', -2: 'u', -3: 'n', -4: 'p',
                 -5: 'f', -6: 'a', -7: 'z', -8: 'y',}
 _si_prefixes[-2] = '\u03bc' if type(3/2).__name__ == 'float' else 'u'
-
 # * in terms of powers of ten
 _si_prefixes_10 = {1: 'da', 2: 'h', -1: 'd', -2: 'c',}
 _si_prefixes_10.update({i * 3: j for i, j in _si_prefixes.items()})
+
+# SI prefix names in terms of powers of 1000
+_si_pfx_names = { 1: 'kilo',   2: 'mega',   3: 'giga',   4: 'tera',
+           0: '', 5: 'peta',   6: 'exa',    7: 'zetta',  8: 'yotta',
+                 -1: 'milli', -2: 'micro', -3: 'nano',  -4: 'pico',
+                 -5: 'femto', -6: 'atto',  -7: 'zepto', -8: 'yocto',}
+# * in terms of powers of ten
+_si_pfx_names_10 = {1: 'deca', 2: 'hecto', -1: 'deci', -2: 'centi'}
+_si_pfx_names_10.update({i * 3: j for i, j in _si_pfx_names.items()})
 
 # 0-99 names - used in _tens function
 _tn_ones =  ('', 'one', 'two', 'three', 'four', 'five', 'six',
@@ -86,7 +94,7 @@ _lg_ords = {1: 'first', 2: 'second', 3: 'third', 5: 'fifth',
 _zero, _hun, _thous = 'zero', 'hundred', 'thousand'
 _neg = 'negative'#'minus'
 
-# preset names - used in precedence and ?tuple? functions
+# preset names - used in precedence and tuple functions
 _pced = {0: 'nullary', 1: 'primary', 2: 'secondary', 3: 'tertiary',
          4: 'quaternary', 6: 'senary', 7: 'septenary', 8: 'octonary', }
 _tupl = {0: 'empty', 1: 'single', 2: 'double', 3: 'triple'}
@@ -122,6 +130,7 @@ refs = ('References and related',
         'http://verbmall.blogspot.com/2007/01/ordinal-numbers-revisited.html',
         'https://english.stackexchange.com/q/352146',
         'https://en.wikipedia.org/wiki/Arity',
+        'https://en.wikipedia.org/wiki/Metric_prefix#List_of_SI_prefixes',
         )
 
 __doc__ = """
@@ -353,12 +362,32 @@ def approx(n):
         if '.' in n:  # floating power
             c, a = n.split('.')
             pwr = int(c)
+            # what to do to remove the footnote in the docstring above
+            #if mthd == 'knuth':
+            #    a = float('0.' + a) * .75 + (pwr * .75) % 1
+            #    pwr = int(pwr * .75 + a % 1)
+            #    a = '{:.9f}'.format(a).split('.')[-1]
             apx = base ** float('0.' + a)
         else:  # whole power
             pwr = int(n)
             apx = 1
+            #if mthd == 'knuth':  # to remove the footnote above
+            #    p, a = '{:.9f}'.format(pwr * 0.75).split('.')
+            #    pwr = int(p)
+            #    apx = base ** float('0.' + a)
     elif not n or abs(n) < base:  # small value
         return str(int(round(n)))
+        #if abs(n) < 10.0 / base:  # for really small values
+        #    lgg = _ln(n, base)
+        #    # decimal module just has to be so off from everything else
+        #    if type(lgg).__name__ == 'Decimal':  # decimal floor
+        #        lgg = int(lgg - lgg % 1 - (1 if lgg < 0 else 0))
+        #    else: lgg -= (lgg % 1)  # flooring anything else
+        #    return approx(n * base ** (2 * abs(lgg))) + _sh_ords[0]
+        #    # or get power of lowest digit?: 1.25e-12 -> b = -14
+        #    # then a = int(round(1.25e-12 * 10 ** abs(b)))
+        #    # return name(a) + ' ' + name(10 ** abs(b)) + 'ths' ?
+        #else: return str(int(round(n)))
     else:  # ints, floats, longs
         if n < 0: sgn, n = '-', abs(n)
         lgg = round(_ln(n, base), 9)
@@ -549,11 +578,24 @@ def prefix(n, suffix=''):
 def si(n, unit=None, base=1e3, **kwargs):
     """approximates n with SI prefixes
     si(299792458/475e-09, 'Hz') -> '631.142 THz'
+
     to use power of ten prefixes (hecto, deca, deci, centi), set base to 10:
+    si(123) ----------> '123.000'
     si(123, base=10) -> '1.230 h'
+
+    to use full prefix name (tera instead of T), set name to True:
+    si(5.137e12) ------------> '5.137 T'
+    si(5.137e12, name=True) -> '5.137 tera'
+
+    to change number formatting, set fmt to custom float format:
+    si(9876543210) ----------------> '9.877 G'
+    si(9876543210, fmt='{:6.2f}') -> '  9.88 G'
     """
     if base not in (10, 1e3, 1024): base = 1e3
     pfx = _si_prefixes_10 if base == 10 else _si_prefixes
+    if kwargs.get('name', False):
+        pfx = _si_pfx_names_10 if base == 10 else _si_pfx_names
+    fmt = kwargs.get('fmt', '{:0.3f}')#'{:7.3f}'
 
     lg = _ln(abs(n) or 1, base)
     pw = int(lg - lg % 1)  # floor, without importing
@@ -564,7 +606,7 @@ def si(n, unit=None, base=1e3, **kwargs):
     if abs(pw) > mx: pw = pw // abs(pw) * mx  # don't pass pfx limits
     pw = max(filter(lambda z: z <= pw, pfx))  # floor to nearest pfx
 
-    si_str = '{:0.3f}'.format(float(base) ** (lg - pw))
+    si_str = fmt.format(float(base) ** float(lg - pw))
     return (sgn + si_str + ' ' + pfx[pw] + unit).rstrip()
 
 # settings functions ---------------------------------------
@@ -612,3 +654,25 @@ def setStyle(style=None):
     _qk_noll = {}; _qk_conw = {}  # must be cleared to match new style
     current_style = style.lower()
     return current_style
+
+# additional functions -------------------------------------
+def gen10_dict(n):
+    "generate powers of ten names; {10^i: ith-illion}"
+    return {i: approx(10 ** i).strip('1.0 ') for i in range(0, (n+1)*3, 3)}
+
+def gen1k_dict(n):
+    "generate powers of thousand names; {1000^i: ith-illion}"
+    return {i: approx(str(i)).strip('1.0 ') for i in range(n + 1)}
+
+def table(n):
+    "generate & print a word table"
+    heads = ['n', 'cardinal', 'ordinal', 'precedence', 'tuple']#, '1000^n']
+    funcs = [str, cardinal, ordinal, precedence, uple]#, _conway]
+
+    h = len(heads); ln = '|'.join([' {:^{}} '] * h)
+    ls = [[f(i) for f in funcs] for i in range(n + 1)]
+    mx = [len(max([q[j] for q in ls] + [heads[j]],key=len)) for j in range(h)]
+
+    print(ln.format(*[q for u in zip(heads, mx) for q in u]))
+    print('+'.join(['-' * (i + 2) for i in mx]))  # +2 for spacing
+    for i in ls: print(ln.format(*[q for u in zip(i, mx) for q in u]))
