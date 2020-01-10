@@ -1,5 +1,4 @@
 from setuptools import setup
-
 from numtxt import VERSION
 
 setup(name = 'numtxt',
@@ -10,7 +9,7 @@ setup(name = 'numtxt',
       author = 'Electrostatus',
       url = 'http://github.com/Electrostatus/numtxt',
       py_modules = ['numtxt'],
-      keywords = 'approximation written words numbers',
+      keywords = 'approximation written words numbers si prefix',
       package_data = {'': ['*.rst']},
       classifiers = [
         'Operating System :: OS Independent',

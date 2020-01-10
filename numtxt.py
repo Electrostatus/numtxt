@@ -1,5 +1,5 @@
 # numtxt - gives full and approximate written forms of numbers
-# Copyright (C) 2017 - 2019, Electrostatus
+# Copyright (C) 2017 - 2020, Electrostatus
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import log
-VERSION = '1.1.0'
+VERSION = '1.1.1'
 
 # prefixes, suffixes and other words -----------------------
 _noll_prefixes = {0: '',  # noll prefix definitions
@@ -575,7 +575,7 @@ def prefix(n, suffix=''):
     # how the names are organized. As such, it's left of out this func
     return func(n + 1, False) + suf
 
-def si(n, unit=None, base=1e3, **kwargs):
+def si(n, unit=None, **kwargs):
     """approximates n with SI prefixes
     si(299792458/475e-09, 'Hz') -> '631.142 THz'
 
@@ -586,15 +586,17 @@ def si(n, unit=None, base=1e3, **kwargs):
     to use full prefix name (tera instead of T), set name to True:
     si(5.137e12) ------------> '5.137 T'
     si(5.137e12, name=True) -> '5.137 tera'
+    si(5.137e12, Name=True) -> '5.137 Tera'  # Capitalized
 
     to change number formatting, set fmt to custom float format:
     si(9876543210) ----------------> '9.877 G'
     si(9876543210, fmt='{:6.2f}') -> '  9.88 G'
     """
-    if base not in (10, 1e3, 1024): base = 1e3
+    base = kwargs.get('base', 1e3)
     pfx = _si_prefixes_10 if base == 10 else _si_prefixes
-    if kwargs.get('name', False):
+    if kwargs.get('name') or kwargs.get('Name'):
         pfx = _si_pfx_names_10 if base == 10 else _si_pfx_names
+        if 'Name' in kwargs: pfx = {i: j.capitalize() for i, j in pfx.items()}
     fmt = kwargs.get('fmt', '{:0.3f}')#'{:7.3f}'
 
     lg = _ln(abs(n) or 1, base)
