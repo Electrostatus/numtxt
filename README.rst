@@ -54,6 +54,11 @@ Naming Methods
 
 Version History
 ---------------
+- **?.?.?**
+  Date
+  - Fixed si handling of zero
+  - table, gen10_dict and gen1k_dict functions added in previous version made public
+
 - **1.1.1** 
   January 10th, 2020
 

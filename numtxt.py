@@ -152,7 +152,8 @@ Additionally, there are three styles for suffixes which can be set
 
 __all__= ['approx', 'name', 'cardinal', 'ordinal', 'precedence', 'prefix',
           'uple', 'setMethod', 'setStyle', 'methods', 'current_method',
-          'suffix_styles', 'current_style', 'VERSION', 'si', ]
+          'suffix_styles', 'current_style', 'VERSION', 'si', 'table',
+          'gen10_dict', 'gen1k_dict', ]
 
 # supporting functions and naming systems ------------------
 def _ln(x, base=None):
@@ -608,7 +609,7 @@ def si(n, unit=None, **kwargs):
     if abs(pw) > mx: pw = pw // abs(pw) * mx  # don't pass pfx limits
     pw = max(filter(lambda z: z <= pw, pfx))  # floor to nearest pfx
 
-    si_str = fmt.format(float(base) ** float(lg - pw))
+    si_str = fmt.format(float(base) ** float(lg - pw) if n else 0)
     return (sgn + si_str + ' ' + pfx[pw] + unit).rstrip()
 
 # settings functions ---------------------------------------
