@@ -54,8 +54,10 @@ Naming Methods
 
 Version History
 ---------------
-- **?.?.?**
+- **1.2.0**
   Date
+
+  - added formatting option to approx function
   - Fixed si handling of zero
   - table, gen10_dict and gen1k_dict functions added in previous version made public
 

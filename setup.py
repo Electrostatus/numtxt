@@ -9,7 +9,7 @@ setup(name = 'numtxt',
       author = 'Philip Herd',
       url = 'http://github.com/Electrostatus/numtxt',
       py_modules = ['numtxt'],
-      keywords = 'approximation written words numbers si prefix',
+      keywords = 'approximation written word number name numeral si prefix cardinal ordinal precedence',
       package_data = {'': ['*.rst']},
       classifiers = [
         'Operating System :: OS Independent',

@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import log
-VERSION = '1.1.1'
+VERSION = '1.2.0'
 
 # prefixes, suffixes and other words -----------------------
 _noll_prefixes = {0: '',  # noll prefix definitions
@@ -345,9 +345,23 @@ def _tens(n):
         else: return name + '-' + _tn_ones[n % 10]
 
 # main functions -------------------------------------------
-def approx(n):
+def approx(n, fmt=None):
     """approximates n
     if n is a string, returns the name of 1000^n instead*
+
+    approx(2.12345e+48) ----------------> '2.123 quindecillion'
+    approx(2.12345e+48, fmt='{:7.3f}') -> '  2.123 quindecillion'
+
+    if working with another module (gmpy2, mpmath, Decimal)
+    the log function may be overridden for compatibility:
+    >>> import numtxt
+    >>> import gmpy2 as gm
+    >>> x = gm.mpfr('123.456e+7890')
+    >>> numtxt.approx(x)
+    OverflowError: cannot convert float infinity to integer
+    >>> numtxt.log = gm.log
+    >>> numtxt.approx(x)
+    '123.456 billinovemvigintisescentillion'
 
     *returns name of 10000^n if naming method is knuth
     """
@@ -427,6 +441,9 @@ def approx(n):
 
     else:  # any undefined method defaults to conway
         nme = _conway(pwr)
+
+    apx_fmt = apx_fmt if fmt is None else fmt
+    if apx_fmt[-1] != ' ': apx_fmt = apx_fmt + ' '
 
     return sgn + apx_fmt.format(apx) + nme
 
