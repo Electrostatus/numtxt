@@ -1,5 +1,5 @@
 # numtxt - gives full and approximate written forms of numbers
-# Copyright (C) 2017 - 2020, Electrostatus
+# Copyright (C) 2017 - 2020, Philip Herd
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
