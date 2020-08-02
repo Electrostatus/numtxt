@@ -54,8 +54,8 @@ Naming Methods
 
 Version History
 ---------------
-- **1.2.0**
-  Date
+- **1.2.0** 
+  August 2nd, 2020
 
   - added formatting option to approx function
   - Fixed si handling of zero
