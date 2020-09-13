@@ -76,6 +76,8 @@ _si_pfx_names = { 1: 'kilo',   2: 'mega',   3: 'giga',   4: 'tera',
 # * in terms of powers of ten
 _si_pfx_names_10 = {1: 'deca', 2: 'hecto', -1: 'deci', -2: 'centi'}
 _si_pfx_names_10.update({i * 3: j for i, j in _si_pfx_names.items()})
+# SI prefix news: https://www.doi.org/10.1126/science.aax0020
+# compound prefix proposal: https://doi.org/10.1016/j.measurement.2019.04.024
 
 # 0-99 names - used in _tens function
 _tn_ones =  ('', 'one', 'two', 'three', 'four', 'five', 'six',
@@ -352,7 +354,7 @@ def approx(n, fmt=None):
     approx(2.12345e+48) ----------------> '2.123 quindecillion'
     approx(2.12345e+48, fmt='{:7.3f}') -> '  2.123 quindecillion'
 
-    if working with another module (gmpy2, mpmath, Decimal)
+    if working with another module (gmpy2, mpmath, decimal)
     the log function may be overridden for compatibility:
     >>> import numtxt
     >>> import gmpy2 as gm
