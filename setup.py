@@ -18,5 +18,8 @@ setup(name = 'numtxt',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Natural Language :: English',
+        'Topic :: Scientific/Engineering :: Mathematics',
+        'Topic :: Text Processing :: Linguistic',
+        'Intended Audience :: Education',
         ],
       )
