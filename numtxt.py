@@ -59,9 +59,9 @@ _suffixes = {'noll': ('illion', 'tillion', 'illard', 'tillard'),
              'rowlett': ('illion',), 'knuth': ('yllion',)}
 
 # SI prefixes in terms of powers of 1000
-_si_prefixes = { 1: 'k',  2: 'M',  3: 'G',  4: 'T',
-          0: '', 5: 'P',  6: 'E',  7: 'Z',  8: 'Y',
-                -1: 'm', -2: 'u', -3: 'n', -4: 'p',
+_si_prefixes = { 1: 'k',  2: 'M',  3: 'G',  4: 'T', # 9: 'R', - 9: 'r',
+          0: '', 5: 'P',  6: 'E',  7: 'Z',  8: 'Y', #10: 'Q', -10: 'q',
+                -1: 'm', -2: 'u', -3: 'n', -4: 'p', #11: 'B', -11: 'b',
                 -5: 'f', -6: 'a', -7: 'z', -8: 'y',}
 _si_prefixes[-2] = '\u03bc' if type(3/2).__name__ == 'float' else 'u'
 # * in terms of powers of ten
@@ -71,6 +71,8 @@ _si_prefixes_10.update({i * 3: j for i, j in _si_prefixes.items()})
 # SI prefix names in terms of powers of 1000
 _si_pfx_names = { 1: 'kilo',   2: 'mega',   3: 'giga',   4: 'tera',
            0: '', 5: 'peta',   6: 'exa',    7: 'zetta',  8: 'yotta',
+                 # 9: 'ronna', 10: 'quecca', 11: 'bundecca',
+                 #-9: 'ronto', -10: 'quecto', -11: 'bundecto'
                  -1: 'milli', -2: 'micro', -3: 'nano',  -4: 'pico',
                  -5: 'femto', -6: 'atto',  -7: 'zepto', -8: 'yocto',}
 # * in terms of powers of ten
@@ -361,6 +363,7 @@ def approx(n, fmt=None):
     >>> x = gm.mpfr('123.456e+7890')
     >>> numtxt.approx(x)
     OverflowError: cannot convert float infinity to integer
+
     >>> numtxt.log = gm.log
     >>> numtxt.approx(x)
     '123.456 billinovemvigintisescentillion'
@@ -393,18 +396,18 @@ def approx(n, fmt=None):
             #    pwr = int(p)
             #    apx = base ** float('0.' + a)
     elif not n or abs(n) < base:  # small value
-        return str(int(round(n)))
-        #if abs(n) < 10.0 / base:  # for really small values
-        #    lgg = _ln(n, base)
-        #    # decimal module just has to be so off from everything else
-        #    if type(lgg).__name__ == 'Decimal':  # decimal floor
-        #        lgg = int(lgg - lgg % 1 - (1 if lgg < 0 else 0))
-        #    else: lgg -= (lgg % 1)  # flooring anything else
-        #    return approx(n * base ** (2 * abs(lgg))) + _sh_ords[0]
-        #    # or get power of lowest digit?: 1.25e-12 -> b = -14
-        #    # then a = int(round(1.25e-12 * 10 ** abs(b)))
-        #    # return name(a) + ' ' + name(10 ** abs(b)) + 'ths' ?
-        #else: return str(int(round(n)))
+        #return str(int(round(n)))
+        if abs(n) < 100.0 / base:  # for really small values
+            lgg = _ln(n, base)
+            # decimal module just has to be so off from everything else
+            if type(lgg).__name__ == 'Decimal':  # decimal floor
+                lgg = int(lgg - lgg % 1 - (1 if lgg < 0 else 0))
+            else: lgg -= (lgg % 1)  # flooring anything else
+            return approx(n * base ** (2 * abs(lgg)), fmt) + _sh_ords[0] + 's'
+            # or get power of lowest digit?: 1.25e-12 -> b = -14
+            # then a = int(round(1.25e-12 * 10 ** abs(b)))
+            # return name(a) + ' ' + name(10 ** abs(b)) + 'ths' ?
+        else: return str(int(round(n)))
     else:  # ints, floats, longs
         if n < 0: sgn, n = '-', abs(n)
         lgg = round(_ln(n, base), 9)
