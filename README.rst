@@ -54,13 +54,17 @@ Naming Methods
 
 Version History
 ---------------
+- **1.2.1** 
+  October 1st, 2020
+
+  - restored approx handling of small values
 - **1.2.0** 
   August 2nd, 2020
 
   - added formatting option to approx function
   - Fixed si handling of zero
   - table, gen10_dict and gen1k_dict functions added in previous version made public
-
+  - previous version really should've been 1.2 but I just wanted to see '1.1.1'
 - **1.1.1** 
   January 10th, 2020
 
