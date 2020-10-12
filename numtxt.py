@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import log
-VERSION = '1.2.1'
+VERSION = '1.2.2'
 
 # prefixes, suffixes and other words -----------------------
 _noll_prefixes = {0: '',  # noll prefix definitions
@@ -396,13 +396,14 @@ def approx(n, fmt=None):
             #    pwr = int(p)
             #    apx = base ** float('0.' + a)
     elif not n or abs(n) < base:  # small value
-        if abs(n) < 100.0 / base:  # for really small values
+        if n and abs(n) < 100.0 / base:  # for really small values
             lgg = _ln(n, base)
             # decimal module just has to be so off from everything else
             if type(lgg).__name__ == 'Decimal':  # decimal floor
                 lgg = int(lgg - lgg % 1 - (1 if lgg < 0 else 0))
             else: lgg -= (lgg % 1)  # flooring anything else
-            return approx(n * base ** (2 * abs(lgg)), fmt) + _sh_ords[0] + 's'
+            n *= base ** abs(lgg)  # negate the power
+            return approx(n * base ** abs(lgg), fmt) + _sh_ords[0] + 's'
         else: return str(int(round(n)))
     else:  # ints, floats, longs
         if n < 0: sgn, n = '-', abs(n)
