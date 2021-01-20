@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import log
-VERSION = '1.2.2'
+__version__ = '1.2.3'
 
 # prefixes, suffixes and other words -----------------------
 _noll_prefixes = {0: '',  # noll prefix definitions
@@ -156,7 +156,7 @@ Additionally, there are three styles for suffixes which can be set
 
 __all__= ['approx', 'name', 'cardinal', 'ordinal', 'precedence', 'prefix',
           'uple', 'setMethod', 'setStyle', 'methods', 'current_method',
-          'suffix_styles', 'current_style', 'VERSION', 'si', 'table',
+          'suffix_styles', 'current_style', 'si', 'table',
           'gen10_dict', 'gen1k_dict', ]
 
 # supporting functions and naming systems ------------------

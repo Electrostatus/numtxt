@@ -1,8 +1,8 @@
 from setuptools import setup
-from numtxt import VERSION
+from numtxt import __version__ as vrs
 
 setup(name = 'numtxt',
-      version = VERSION,
+      version = vrs,
       description = 'gives full and approximate written forms of numbers',
       long_description = open('README.rst').read(),
       license = 'GPLv3',

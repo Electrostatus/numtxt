@@ -54,6 +54,11 @@ Naming Methods
 
 Version History
 ---------------
+- **1.2.3**
+  January 20th, 2021
+
+  - VERSION switched to __version__
+  - this module's 4th birthday
 - **1.2.2** 
   October 12th, 2020
 
