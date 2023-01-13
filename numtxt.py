@@ -71,8 +71,8 @@ _si_prefixes_10.update({i * 3: j for i, j in _si_prefixes.items()})
 # SI prefix names in terms of powers of 1000
 _si_pfx_names = { 1: 'kilo',   2: 'mega',   3: 'giga',   4: 'tera',
            0: '', 5: 'peta',   6: 'exa',    7: 'zetta',  8: 'yotta',
-                 # 9: 'ronna', 10: 'quecca', 11: 'bundecca',
-                 #-9: 'ronto', -10: 'quecto', -11: 'bundecto'
+                  9: 'ronna',  10: 'quecca',#  11: 'bundecca',
+                 -9: 'ronto', -10: 'quecto',# -11: 'bundecto'
                  -1: 'milli', -2: 'micro', -3: 'nano',  -4: 'pico',
                  -5: 'femto', -6: 'atto',  -7: 'zepto', -8: 'yocto',}
 # * in terms of powers of ten
@@ -80,6 +80,7 @@ _si_pfx_names_10 = {1: 'deca', 2: 'hecto', -1: 'deci', -2: 'centi'}
 _si_pfx_names_10.update({i * 3: j for i, j in _si_pfx_names.items()})
 # SI prefix news: https://www.doi.org/10.1126/science.aax0020
 # compound prefix proposal: https://doi.org/10.1016/j.measurement.2019.04.024
+# r, q prefixes approved: https://www.theguardian.com/science/2022/nov/18/earth-six-ronnagrams-new-prefixes-big-and-small
 
 # 0-99 names - used in _tens function
 _tn_ones =  ('', 'one', 'two', 'three', 'four', 'five', 'six',
@@ -611,6 +612,9 @@ def si(n, unit=None, **kwargs):
     to change number formatting, set fmt to custom float format:
     si(9876543210) ----------------> '9.877 G'
     si(9876543210, fmt='{:6.2f}') -> '  9.88 G'
+    set fmt to None for just the prefix:
+    si(9876543210, fmt=None) ------> 'G'
+    si(9876543210, 'm', fmt=None) -> 'Gm'
     """
     base = kwargs.get('base', 1e3)
     pfx = _si_prefixes_10 if base == 10 else _si_prefixes
@@ -628,6 +632,7 @@ def si(n, unit=None, **kwargs):
     if abs(pw) > mx: pw = pw // abs(pw) * mx  # don't pass pfx limits
     pw = max(filter(lambda z: z <= pw, pfx))  # floor to nearest pfx
 
+    if not fmt: return pfx[pw] + unit  # no digit formatting
     si_str = fmt.format(float(base) ** float(lg - pw) if n else 0)
     return (sgn + si_str + ' ' + pfx[pw] + unit).rstrip()
 
