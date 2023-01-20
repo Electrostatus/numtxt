@@ -4,7 +4,7 @@ from numtxt import __version__ as vrs
 setup(name = 'numtxt',
       version = vrs,
       description = 'gives full and approximate written forms of numbers',
-      long_description = open('README.rst').read(),
+      long_description = open('README.rst', encoding='utf-8').read(),
       license = 'GPLv3',
       author = 'Philip Herd',
       url = 'http://github.com/Electrostatus/numtxt',

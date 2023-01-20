@@ -54,6 +54,10 @@ Naming Methods
 
 Version History
 ---------------
+- **1.2.4**
+  January 20th, 2023
+
+  - added new si prefixes
 - **1.2.3**
   January 20th, 2021
 

@@ -1,5 +1,5 @@
 # numtxt - gives full and approximate written forms of numbers
-# Copyright (C) 2017 - 2021, Philip Herd
+# Copyright (C) 2017 - 2023, Philip Herd
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import log
-__version__ = '1.2.3'
+__version__ = '1.2.4'
 
 # prefixes, suffixes and other words -----------------------
 _noll_prefixes = {0: '',  # noll prefix definitions
@@ -59,8 +59,8 @@ _suffixes = {'noll': ('illion', 'tillion', 'illard', 'tillard'),
              'rowlett': ('illion',), 'knuth': ('yllion',)}
 
 # SI prefixes in terms of powers of 1000
-_si_prefixes = { 1: 'k',  2: 'M',  3: 'G',  4: 'T', # 9: 'R', - 9: 'r',
-          0: '', 5: 'P',  6: 'E',  7: 'Z',  8: 'Y', #10: 'Q', -10: 'q',
+_si_prefixes = { 1: 'k',  2: 'M',  3: 'G',  4: 'T',  9: 'R', - 9: 'r',
+          0: '', 5: 'P',  6: 'E',  7: 'Z',  8: 'Y', 10: 'Q', -10: 'q',
                 -1: 'm', -2: 'u', -3: 'n', -4: 'p', #11: 'B', -11: 'b',
                 -5: 'f', -6: 'a', -7: 'z', -8: 'y',}
 _si_prefixes[-2] = '\u03bc' if type(3/2).__name__ == 'float' else 'u'
@@ -78,9 +78,13 @@ _si_pfx_names = { 1: 'kilo',   2: 'mega',   3: 'giga',   4: 'tera',
 # * in terms of powers of ten
 _si_pfx_names_10 = {1: 'deca', 2: 'hecto', -1: 'deci', -2: 'centi'}
 _si_pfx_names_10.update({i * 3: j for i, j in _si_pfx_names.items()})
-# SI prefix news: https://www.doi.org/10.1126/science.aax0020
-# compound prefix proposal: https://doi.org/10.1016/j.measurement.2019.04.024
-# r, q prefixes approved: https://www.theguardian.com/science/2022/nov/18/earth-six-ronnagrams-new-prefixes-big-and-small
+# SI prefix news:
+#    https://www.doi.org/10.1126/science.aax0020
+# compound prefix proposal:
+#    https://doi.org/10.1016/j.measurement.2019.04.024
+# r, q prefixes approved:
+#    https://phys.org/news/2022-11-earth-ronnagrams-metric-prefixes-voted.html
+#    https://www.bipm.org/en/-/2022-12-19-si-prefixes
 
 # 0-99 names - used in _tens function
 _tn_ones =  ('', 'one', 'two', 'three', 'four', 'five', 'six',
