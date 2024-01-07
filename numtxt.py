@@ -1,5 +1,5 @@
 # numtxt - gives full and approximate written forms of numbers
-# Copyright (C) 2017 - 2023, Philip Herd
+# Copyright (C) 2017 - 2024, Philip Herd
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -161,7 +161,7 @@ Additionally, there are three styles for suffixes which can be set
 
 __all__= ['approx', 'name', 'cardinal', 'ordinal', 'precedence', 'prefix',
           'uple', 'setMethod', 'setStyle', 'methods', 'current_method',
-          'suffix_styles', 'current_style', 'si', 'table',
+          'suffix_styles', 'current_style', 'si', 'table', 'interval',
           'gen10_dict', 'gen1k_dict', ]
 
 # supporting functions and naming systems ------------------
@@ -375,7 +375,7 @@ def approx(n, fmt=None):
 
     *returns name of 10000^n if naming method is knuth
     """
-    sgn, mthd = '', current_method
+    sgn, mthd = 1, current_method
     base = 10000 if mthd == 'knuth' else 1000  # in order to be correct
 
     # parse input
@@ -402,16 +402,17 @@ def approx(n, fmt=None):
             #    apx = base ** float('0.' + a)
     elif not n or abs(n) < base:  # small value
         if n and abs(n) < 100.0 / base:  # for really small values
+            if n < 0: sgn = -1; n *= -1
             lgg = _ln(n, base)
             # decimal module just has to be so off from everything else
             if type(lgg).__name__ == 'Decimal':  # decimal floor
                 lgg = int(lgg - lgg % 1 - (1 if lgg < 0 else 0))
             else: lgg -= (lgg % 1)  # flooring anything else
             n *= base ** abs(lgg)  # negate the power
-            return approx(n * base ** abs(lgg), fmt) + _sh_ords[0] + 's'
+            return approx(sgn * n * base ** abs(lgg), fmt) + _sh_ords[0] + 's'
         else: return str(int(round(n)))
     else:  # ints, floats, longs
-        if n < 0: sgn, n = '-', abs(n)
+        if n < 0: sgn, n = -1, abs(n)
         lgg = round(_ln(n, base), 9)
         pwr = int(lgg)
         apx = base ** (lgg - pwr)
@@ -452,7 +453,7 @@ def approx(n, fmt=None):
     apx_fmt = apx_fmt if fmt is None else fmt
     if apx_fmt[-1] != ' ': apx_fmt = apx_fmt + ' '
 
-    return sgn + apx_fmt.format(apx) + nme
+    return apx_fmt.format(sgn * apx) + nme
 
 def name(n, condensed=False):
     """returns the cardinal name of n
@@ -607,6 +608,9 @@ def si(n, unit=None, **kwargs):
     to use power of ten prefixes (hecto, deca, deci, centi), set base to 10:
     si(123) ----------> '123.000'
     si(123, base=10) -> '1.230 h'
+    for binary prefixes, set base to 1024:
+    si(1e12, 'B') -------------> '1.000 TB'
+    si(1e12, 'iB', base=1024) -> '931.323 GiB'
 
     to use full prefix name (tera instead of T), set name to True:
     si(5.137e12) ------------> '5.137 T'
@@ -631,14 +635,14 @@ def si(n, unit=None, **kwargs):
     pw = int(lg - lg % 1)  # floor, without importing
     mx = max(pfx.keys())  # if SI adds more, update the prefix dict
 
-    sgn = '' if n >= 0 else '-'
+    sgn = 1 if n >= 0 else -1
     unit = str(unit) if unit is not None else ''
     if abs(pw) > mx: pw = pw // abs(pw) * mx  # don't pass pfx limits
     pw = max(filter(lambda z: z <= pw, pfx))  # floor to nearest pfx
 
     if not fmt: return pfx[pw] + unit  # no digit formatting
-    si_str = fmt.format(float(base) ** float(lg - pw) if n else 0)
-    return (sgn + si_str + ' ' + pfx[pw] + unit).rstrip()
+    si_str = fmt.format(sgn * float(base) ** float(lg - pw) if n else 0)
+    return (si_str + ' ' + pfx[pw] + unit).rstrip()
 
 # settings functions ---------------------------------------
 def setMethod(method=None):
@@ -707,3 +711,101 @@ def table(n):
     print(ln.format(*[q for u in zip(heads, mx) for q in u]))
     print('+'.join(['-' * (i + 2) for i in mx]))  # +2 for spacing
     for i in ls: print(ln.format(*[q for u in zip(i, mx) for q in u]))
+
+def interval(secs, style='terse', **kwargs):
+    """convert a number of seconds to a readable time string
+    6357 -> '1h 45m 57s'
+
+    style   - str; must be one of the following four options:
+              t, terse : 6357 -> '1h 45m 57s' (the default)
+              s, short : 6357 -> '1 hrs 45 min 57 sec'
+              l, long  : 6357 -> '1 hour, 45 minutes, 57 seconds'
+              c, code  : 6357 -> '1:45:57'
+              note: code uses long style for units larger than hours
+
+    zeros   - bool; show zeros in output or not, default False
+    ndigits - int ; positive number of digits to round seconds to, default 3
+    use_dys - bool; include days  in output or not, default True
+    use_wks - bool; include weeks in output or not, default False
+    use_yrs - bool; include years in output or not, default True
+    year    - length of year in days, default is 365.25   (31557600 seconds)
+    """  # julian year is 365.25;   gregorian is 365.2425 (31556952 seconds)
+    # note: this function is entirely self-contained
+    #       (no imports or supporting functions required)
+
+    # various time units in seconds and end result
+    W, D, H, M, res = 604800, 86400, 3600, 60, ''
+    df_yr = 365.25  # default year length in days
+    Y = abs(kwargs.get('year', df_yr)) * D
+    if int(Y) == Y: Y = int(Y)
+
+    # a datetime.timedelta object, convert to seconds
+    if type(secs).__name__ == 'timedelta': secs = secs.total_seconds()
+
+    # options
+    if type(style) == int: style %= 4
+    syl = str(style).lower()
+    zo = kwargs.get('zeros', False)
+    ud = kwargs.get('use_dys', True)
+    uw = kwargs.get('use_wks', False)
+    uy = kwargs.get('use_yrs', True)
+    dd = int(abs(kwargs.get('ndigits', kwargs.get('digits', 3))))
+
+    # calculate each time unit amount
+    secs = abs(secs)
+    if uy: y = int(secs // Y); secs -= y * Y
+    if uw: w = int(secs // W); secs -= w * W
+    if ud: d = int(secs // D); secs -= d * D
+    h = int(secs // H); secs -= h * H
+    m = int(secs // M); secs -= m * M
+    secs = round(secs, dd + 1)
+
+    # select time names for string return style
+    if   syl in {'0', 't', 'terse'}:
+        ys, ws, ds, hs, ms, ss = 'ywdhms'
+
+    elif syl in {'1', 's', 'short'}:
+        # the leading spaces are important
+        ys, ws, ds = ' yrs', ' wks', ' dys'
+        hs, ms, ss = ' hrs', ' min', ' sec'
+
+    elif syl in {'2', 'l', 'long', '3', 'c', 'code'}:
+        # code style uses day, week, year for long time periods
+
+        # singular and plural forms
+        ys, ws, ds = ' year', ' week', ' day'
+        hs, ms, ss = ' hour', ' minute', ' second'
+        yp, wp, dp = ' years', ' weeks', ' days'
+        hp, mp, sp = ' hours', ' minutes', ' seconds'
+        # select which form for use
+        if uy: ys = (yp if y != 1 else ys) + ','
+        if uw: ws = (wp if w != 1 else ws) + ','
+        if ud: ds = (dp if d != 1 else ds) + ','
+        hs = (hp if h != 1 else hs) + ','
+        ms = (mp if m != 1 else ms) + ','
+        ss = (sp if secs != 1 else ss) + ','
+
+    else:  # unknown style, throw error
+        msg = 'Unknown style "{}"'.format(syl)
+        msg += ", valid styles are 'terse', 'short', 'long' or 'code'"
+        raise TypeError(msg)
+
+    # build the string
+    # hms part (code/all other styles)
+    if syl in {'3', 'c', 'code'}:
+        # use whole values if possible
+        if int(secs) == secs: fmt = '{:02d}'; secs = int(secs)
+        else: fmt = '{{:0{}.{}f}}'.format(dd + 3, dd)
+        res = ('{:01d}:{:02d}:' + fmt).format(h, m, secs)
+    else:
+        if secs or zo:
+            if int(secs) == secs: res = str(int(secs)) + ss
+            else: res = '{:.{}f}'.format(secs, dd) + ss
+        if m or zo: res = str(m) + ms + ' ' + res
+        if h or zo: res = str(h) + hs + ' ' + res
+
+    # ywd part
+    if ud and (d or zo): res = str(d) + ds + ' ' + res
+    if uw and (w or zo): res = str(w) + ws + ' ' + res
+    if uy and (y or zo): res = str(y) + ys + ' ' + res
+    return res.strip(' ,')

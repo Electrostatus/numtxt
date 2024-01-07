@@ -54,6 +54,11 @@ Naming Methods
 
 Version History
 ---------------
+- **?.?.?**
+  ?-future-?
+
+  - adjusted si and approx functions to handle formatting options that include the sign (E.G. fmt='{:+8.03f}')
+  - add interval function, accepts a number of seconds or a datetime.timedelta object and returns a readable time duration string
 - **1.2.4**
   January 20th, 2023
 
