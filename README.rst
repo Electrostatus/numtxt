@@ -2,11 +2,11 @@ numtxt
 ======
 A pure Python module that gives both full and approximate names for numbers
 
-Contains functions that give the cardinal name (one, two, three, ...), the ordinal name (first, second, third, ...), the precedence (primary, secondary, tertiary, ...) as well as approximations (23.3458e45 -> '23.346 quattuordecillion') and prefixes. Has four different naming methods for powers and three different suffix styles. Additionally contains an SI prefix naming function.
+Contains functions that give the cardinal name (one, two, three, ...), the ordinal name (first, second, third, ...), the precedence (primary, secondary, tertiary, ...) as well as approximations (23.3458e45 -> '23.346 quattuordecillion') and prefixes. Has four different naming methods for powers and three different suffix styles. Additionally contains an SI prefix naming function and readable time-delta string function (7234 -> '2 hours, 34 seconds').
 
 Suffix Styles
 -------------
-- **short** 
+- **short**
   - Assigns 'illion' to names. This is the default style.
 
   - 10^6 = million, 10^9 = billion, 10^12 = trillion, ...
@@ -54,11 +54,11 @@ Naming Methods
 
 Version History
 ---------------
-- **?.?.?**
-  ?-future-?
+- **1.3.0**
+  January 20th, 2024
 
   - adjusted si and approx functions to handle formatting options that include the sign (E.G. fmt='{:+8.03f}')
-  - add interval function, accepts a number of seconds or a datetime.timedelta object and returns a readable time duration string
+  - add interval function, accepts a number of seconds or a datetime.timedelta object and returns a readable time duration string (E.G. 7234 -> '2 hours, 34 seconds')
 - **1.2.4**
   January 20th, 2023
 
@@ -68,26 +68,26 @@ Version History
 
   - VERSION switched to __version__
   - this module's 4th birthday
-- **1.2.2** 
+- **1.2.2**
   October 12th, 2020
 
   - fixed (again) approx handling of zero
-- **1.2.1** 
+- **1.2.1**
   October 1st, 2020
 
   - restored approx handling of small values
-- **1.2.0** 
+- **1.2.0**
   August 2nd, 2020
 
   - added formatting option to approx function
   - Fixed si handling of zero
   - table, gen10_dict and gen1k_dict functions added in previous version made public
-- **1.1.1** 
+- **1.1.1**
   January 10th, 2020
 
   - Added si prefix function
   - Minor adjustments
-- **1.1.0** 
+- **1.1.0**
   August 18th, 2019
 
   - Added precedence function (primary, secondary, tertiary, ...)
@@ -96,15 +96,15 @@ Version History
   - Added (t)uple function (single, double, triple, ...)
   - Added cardinal function call; identical to name function
   - Added version history to README
-- **1.0.2** 
+- **1.0.2**
   November 29th, 2017
 
   - Fixed approx handling of zero & removed approx handling of small values
-- **1.0.1** 
+- **1.0.1**
   January 20th, 2017
 
   - Modified readme/setup.py for correct pip installation
-- **1.0.0** 
+- **1.0.0**
   January 20th, 2017
 
   - Initial release

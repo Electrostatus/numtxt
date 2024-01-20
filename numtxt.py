@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from math import log
-__version__ = '1.2.4'
+__version__ = '1.3.0'
 
 # prefixes, suffixes and other words -----------------------
 _noll_prefixes = {0: '',  # noll prefix definitions
@@ -608,6 +608,7 @@ def si(n, unit=None, **kwargs):
     to use power of ten prefixes (hecto, deca, deci, centi), set base to 10:
     si(123) ----------> '123.000'
     si(123, base=10) -> '1.230 h'
+
     for binary prefixes, set base to 1024:
     si(1e12, 'B') -------------> '1.000 TB'
     si(1e12, 'iB', base=1024) -> '931.323 GiB'
